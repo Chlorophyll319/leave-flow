@@ -1,7 +1,14 @@
+using LeaveFlow.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")
+        ?? throw new InvalidOperationException("找不到連線字串 'DefaultConnection'，請先以 User Secrets 或環境變數設定。")));
 
 var app = builder.Build();
 
