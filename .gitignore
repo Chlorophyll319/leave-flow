@@ -480,3 +480,9 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Independently versioned AI configuration
+.agents/
+.claude/
+.mcp.json
+AGENTS.md
