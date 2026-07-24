@@ -1,0 +1,67 @@
+@model List<LeaveRequest>
+
+@{
+    ViewData["Title"] = "請假申請清單";
+    var taipeiZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Taipei");
+
+    static string LeaveTypeLabel(LeaveType type) => type switch
+    {
+        LeaveType.Annual => "特休",
+        LeaveType.Sick => "病假",
+        LeaveType.Personal => "事假",
+        LeaveType.Other => "其他",
+        _ => type.ToString()
+    };
+
+    static string StatusLabel(LeaveStatus status) => status switch
+    {
+        LeaveStatus.Pending => "待審核",
+        LeaveStatus.Approved => "已核准",
+        LeaveStatus.Rejected => "已駁回",
+        LeaveStatus.Cancelled => "已取消",
+        _ => status.ToString()
+    };
+}
+
+<h1>請假申請清單</h1>
+
+<p>
+    <a asp-controller="LeaveRequests" asp-action="Create" class="btn btn-primary">新增申請</a>
+</p>
+
+@if (!Model.Any())
+{
+    <p>目前沒有請假申請</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>員工姓名</th>
+                <th>部門</th>
+                <th>假別</th>
+                <th>開始日期</th>
+                <th>結束日期</th>
+                <th>請假天數</th>
+                <th>狀態</th>
+                <th>建立時間</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Employee?.Name</td>
+                    <td>@item.Employee?.Department</td>
+                    <td>@LeaveTypeLabel(item.LeaveType)</td>
+                    <td>@item.StartDate.ToString("yyyy-MM-dd")</td>
+                    <td>@item.EndDate.ToString("yyyy-MM-dd")</td>
+                    <td>@item.Days</td>
+                    <td>@StatusLabel(item.Status)</td>
+                    <td>@TimeZoneInfo.ConvertTimeFromUtc(item.CreatedAt, taipeiZone).ToString("yyyy-MM-dd HH:mm") (UTC+8)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
