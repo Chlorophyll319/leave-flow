@@ -484,5 +484,7 @@ $RECYCLE.BIN/
 # Independently versioned AI configuration
 .agents/
 .claude/
+.github/
+.codex/
 .mcp.json
 AGENTS.md
