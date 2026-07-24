@@ -26,6 +26,20 @@ public class LeaveRequestsController : Controller
         return View(leaveRequests);
     }
 
+    public async Task<IActionResult> Details(int id)
+    {
+        var leaveRequest = await _context.LeaveRequests
+            .Include(r => r.Employee)
+            .FirstOrDefaultAsync(r => r.Id == id);
+
+        if (leaveRequest is null)
+        {
+            return NotFound();
+        }
+
+        return View(leaveRequest);
+    }
+
     public async Task<IActionResult> Create()
     {
         ViewData["Employees"] = await GetEmployeeOptionsAsync();

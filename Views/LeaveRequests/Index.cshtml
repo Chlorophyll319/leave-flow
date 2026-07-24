@@ -46,6 +46,7 @@ else
                 <th>請假天數</th>
                 <th>狀態</th>
                 <th>建立時間</th>
+                <th>操作</th>
             </tr>
         </thead>
         <tbody>
@@ -60,6 +61,9 @@ else
                     <td>@item.Days</td>
                     <td>@StatusLabel(item.Status)</td>
                     <td>@TimeZoneInfo.ConvertTimeFromUtc(item.CreatedAt, taipeiZone).ToString("yyyy-MM-dd HH:mm") (UTC+8)</td>
+                    <td>
+                        <a asp-controller="LeaveRequests" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">詳細</a>
+                    </td>
                 </tr>
             }
         </tbody>
