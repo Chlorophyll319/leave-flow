@@ -63,4 +63,8 @@
     }
 </dl>
 
+@if (Model.Status == LeaveStatus.Pending)
+{
+    <a asp-controller="LeaveRequests" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">編輯</a>
+}
 <a asp-controller="LeaveRequests" asp-action="Index" class="btn btn-secondary">返回清單</a>

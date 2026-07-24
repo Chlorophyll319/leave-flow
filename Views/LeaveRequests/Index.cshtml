@@ -25,6 +25,11 @@
 
 <h1>請假申請清單</h1>
 
+@if (TempData["ErrorMessage"] is string errorMessage)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
 <p>
     <a asp-controller="LeaveRequests" asp-action="Create" class="btn btn-primary">新增申請</a>
 </p>
@@ -63,6 +68,10 @@ else
                     <td>@TimeZoneInfo.ConvertTimeFromUtc(item.CreatedAt, taipeiZone).ToString("yyyy-MM-dd HH:mm") (UTC+8)</td>
                     <td>
                         <a asp-controller="LeaveRequests" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">詳細</a>
+                        @if (item.Status == LeaveStatus.Pending)
+                        {
+                            <a asp-controller="LeaveRequests" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">編輯</a>
+                        }
                     </td>
                 </tr>
             }
