@@ -160,6 +160,32 @@ public class LeaveRequestsController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Cancel(int id)
+    {
+        var leaveRequest = await _context.LeaveRequests.FirstOrDefaultAsync(r => r.Id == id);
+
+        if (leaveRequest is null)
+        {
+            return NotFound();
+        }
+
+        if (leaveRequest.Status != LeaveStatus.Pending)
+        {
+            TempData["ErrorMessage"] = "僅待審核的申請可以取消";
+            return RedirectToAction(nameof(Index));
+        }
+
+        leaveRequest.Status = LeaveStatus.Cancelled;
+        leaveRequest.DecisionNote = null;
+        leaveRequest.DecidedAt = null;
+
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction(nameof(Index));
+    }
+
     private async Task<IEnumerable<SelectListItem>> GetEmployeeOptionsAsync()
     {
         return await _context.Employees

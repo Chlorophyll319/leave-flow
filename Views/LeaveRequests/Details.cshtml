@@ -66,5 +66,8 @@
 @if (Model.Status == LeaveStatus.Pending)
 {
     <a asp-controller="LeaveRequests" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">編輯</a>
+    <form asp-controller="LeaveRequests" asp-action="Cancel" asp-route-id="@Model.Id" method="post" class="d-inline" onsubmit="return confirm('確定要取消這筆請假申請嗎？');">
+        <button type="submit" class="btn btn-danger">取消</button>
+    </form>
 }
 <a asp-controller="LeaveRequests" asp-action="Index" class="btn btn-secondary">返回清單</a>
