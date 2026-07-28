@@ -25,6 +25,11 @@
 
 <h1>請假申請清單</h1>
 
+@if (TempData["ErrorMessage"] is string errorMessage)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
 <p>
     <a asp-controller="LeaveRequests" asp-action="Create" class="btn btn-primary">新增申請</a>
 </p>
@@ -46,6 +51,7 @@ else
                 <th>請假天數</th>
                 <th>狀態</th>
                 <th>建立時間</th>
+                <th>操作</th>
             </tr>
         </thead>
         <tbody>
@@ -60,6 +66,16 @@ else
                     <td>@item.Days</td>
                     <td>@StatusLabel(item.Status)</td>
                     <td>@TimeZoneInfo.ConvertTimeFromUtc(item.CreatedAt, taipeiZone).ToString("yyyy-MM-dd HH:mm") (UTC+8)</td>
+                    <td>
+                        <a asp-controller="LeaveRequests" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">詳細</a>
+                        @if (item.Status == LeaveStatus.Pending)
+                        {
+                            <a asp-controller="LeaveRequests" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">編輯</a>
+                            <form asp-controller="LeaveRequests" asp-action="Cancel" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('確定要取消這筆請假申請嗎？');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">取消</button>
+                            </form>
+                        }
+                    </td>
                 </tr>
             }
         </tbody>

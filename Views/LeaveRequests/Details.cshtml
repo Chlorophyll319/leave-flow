@@ -1,0 +1,73 @@
+@model LeaveRequest
+
+@{
+    ViewData["Title"] = "請假申請詳細資料";
+    var taipeiZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Taipei");
+
+    static string LeaveTypeLabel(LeaveType type) => type switch
+    {
+        LeaveType.Annual => "特休",
+        LeaveType.Sick => "病假",
+        LeaveType.Personal => "事假",
+        LeaveType.Other => "其他",
+        _ => type.ToString()
+    };
+
+    static string StatusLabel(LeaveStatus status) => status switch
+    {
+        LeaveStatus.Pending => "待審核",
+        LeaveStatus.Approved => "已核准",
+        LeaveStatus.Rejected => "已駁回",
+        LeaveStatus.Cancelled => "已取消",
+        _ => status.ToString()
+    };
+}
+
+<h1>請假申請詳細資料</h1>
+
+<dl class="row">
+    <dt class="col-sm-3">員工姓名</dt>
+    <dd class="col-sm-9">@Model.Employee?.Name</dd>
+
+    <dt class="col-sm-3">部門</dt>
+    <dd class="col-sm-9">@Model.Employee?.Department</dd>
+
+    <dt class="col-sm-3">假別</dt>
+    <dd class="col-sm-9">@LeaveTypeLabel(Model.LeaveType)</dd>
+
+    <dt class="col-sm-3">開始日期</dt>
+    <dd class="col-sm-9">@Model.StartDate.ToString("yyyy-MM-dd")</dd>
+
+    <dt class="col-sm-3">結束日期</dt>
+    <dd class="col-sm-9">@Model.EndDate.ToString("yyyy-MM-dd")</dd>
+
+    <dt class="col-sm-3">請假天數</dt>
+    <dd class="col-sm-9">@Model.Days</dd>
+
+    <dt class="col-sm-3">請假理由</dt>
+    <dd class="col-sm-9">@Model.Reason</dd>
+
+    <dt class="col-sm-3">狀態</dt>
+    <dd class="col-sm-9">@StatusLabel(Model.Status)</dd>
+
+    <dt class="col-sm-3">建立時間</dt>
+    <dd class="col-sm-9">@TimeZoneInfo.ConvertTimeFromUtc(Model.CreatedAt, taipeiZone).ToString("yyyy-MM-dd HH:mm") (UTC+8)</dd>
+
+    @if (Model.Status is LeaveStatus.Approved or LeaveStatus.Rejected)
+    {
+        <dt class="col-sm-3">簽核備註</dt>
+        <dd class="col-sm-9">@Model.DecisionNote</dd>
+
+        <dt class="col-sm-3">簽核時間</dt>
+        <dd class="col-sm-9">@TimeZoneInfo.ConvertTimeFromUtc(Model.DecidedAt!.Value, taipeiZone).ToString("yyyy-MM-dd HH:mm") (UTC+8)</dd>
+    }
+</dl>
+
+@if (Model.Status == LeaveStatus.Pending)
+{
+    <a asp-controller="LeaveRequests" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">編輯</a>
+    <form asp-controller="LeaveRequests" asp-action="Cancel" asp-route-id="@Model.Id" method="post" class="d-inline" onsubmit="return confirm('確定要取消這筆請假申請嗎？');">
+        <button type="submit" class="btn btn-danger">取消</button>
+    </form>
+}
+<a asp-controller="LeaveRequests" asp-action="Index" class="btn btn-secondary">返回清單</a>

@@ -1,0 +1,53 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+@model LeaveRequestFormViewModel
+
+@{
+    ViewData["Title"] = "編輯請假申請";
+    var leaveTypeOptions = (IEnumerable<SelectListItem>)ViewData["LeaveTypes"]!;
+}
+
+<h1>編輯請假申請</h1>
+
+<div asp-validation-summary="All" class="text-danger"></div>
+
+<form asp-controller="LeaveRequests" asp-action="Edit" method="post">
+    <input type="hidden" asp-for="EmployeeId" />
+
+    <div class="mb-3">
+        <label class="form-label">員工</label>
+        <input type="text" class="form-control" value="@ViewData["EmployeeName"]（@ViewData["EmployeeDepartment"]）" readonly />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="LeaveType" class="form-label"></label>
+        <select asp-for="LeaveType" asp-items="leaveTypeOptions" class="form-select">
+            <option value="">請選擇假別</option>
+        </select>
+        <span asp-validation-for="LeaveType" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="StartDate" class="form-label"></label>
+        <input asp-for="StartDate" class="form-control" />
+        <span asp-validation-for="StartDate" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="EndDate" class="form-label"></label>
+        <input asp-for="EndDate" class="form-control" />
+        <span asp-validation-for="EndDate" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Reason" class="form-label"></label>
+        <textarea asp-for="Reason" class="form-control" maxlength="200"></textarea>
+        <span asp-validation-for="Reason" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">儲存</button>
+    <a asp-controller="LeaveRequests" asp-action="Index" class="btn btn-secondary">返回清單</a>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

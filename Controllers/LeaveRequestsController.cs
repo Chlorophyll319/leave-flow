@@ -26,11 +26,100 @@ public class LeaveRequestsController : Controller
         return View(leaveRequests);
     }
 
+    public async Task<IActionResult> Details(int id)
+    {
+        var leaveRequest = await _context.LeaveRequests
+            .Include(r => r.Employee)
+            .FirstOrDefaultAsync(r => r.Id == id);
+
+        if (leaveRequest is null)
+        {
+            return NotFound();
+        }
+
+        return View(leaveRequest);
+    }
+
     public async Task<IActionResult> Create()
     {
         ViewData["Employees"] = await GetEmployeeOptionsAsync();
         ViewData["LeaveTypes"] = GetLeaveTypeOptions();
         return View();
+    }
+
+    public async Task<IActionResult> Edit(int id)
+    {
+        var leaveRequest = await _context.LeaveRequests
+            .Include(r => r.Employee)
+            .FirstOrDefaultAsync(r => r.Id == id);
+
+        if (leaveRequest is null)
+        {
+            return NotFound();
+        }
+
+        if (leaveRequest.Status != LeaveStatus.Pending)
+        {
+            TempData["ErrorMessage"] = "僅待審核的申請可以編輯";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var vm = new LeaveRequestFormViewModel
+        {
+            EmployeeId = leaveRequest.EmployeeId,
+            LeaveType = leaveRequest.LeaveType,
+            StartDate = leaveRequest.StartDate,
+            EndDate = leaveRequest.EndDate,
+            Reason = leaveRequest.Reason
+        };
+
+        ViewData["LeaveTypes"] = GetLeaveTypeOptions();
+        ViewData["EmployeeName"] = leaveRequest.Employee?.Name;
+        ViewData["EmployeeDepartment"] = leaveRequest.Employee?.Department;
+
+        return View(vm);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, LeaveRequestFormViewModel vm)
+    {
+        var leaveRequest = await _context.LeaveRequests
+            .Include(r => r.Employee)
+            .FirstOrDefaultAsync(r => r.Id == id);
+
+        if (leaveRequest is null)
+        {
+            return NotFound();
+        }
+
+        if (leaveRequest.Status != LeaveStatus.Pending)
+        {
+            TempData["ErrorMessage"] = "僅待審核的申請可以編輯";
+            return RedirectToAction(nameof(Index));
+        }
+
+        if (vm.LeaveType.HasValue && !Enum.IsDefined(vm.LeaveType.Value))
+        {
+            ModelState.AddModelError(nameof(vm.LeaveType), "假別選項無效");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            ViewData["LeaveTypes"] = GetLeaveTypeOptions();
+            ViewData["EmployeeName"] = leaveRequest.Employee?.Name;
+            ViewData["EmployeeDepartment"] = leaveRequest.Employee?.Department;
+            return View(vm);
+        }
+
+        leaveRequest.LeaveType = vm.LeaveType!.Value;
+        leaveRequest.StartDate = vm.StartDate!.Value;
+        leaveRequest.EndDate = vm.EndDate!.Value;
+        leaveRequest.Reason = vm.Reason!;
+
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction(nameof(Index));
     }
 
     [HttpPost]
@@ -66,6 +155,32 @@ public class LeaveRequestsController : Controller
         };
 
         _context.LeaveRequests.Add(leaveRequest);
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Cancel(int id)
+    {
+        var leaveRequest = await _context.LeaveRequests.FirstOrDefaultAsync(r => r.Id == id);
+
+        if (leaveRequest is null)
+        {
+            return NotFound();
+        }
+
+        if (leaveRequest.Status != LeaveStatus.Pending)
+        {
+            TempData["ErrorMessage"] = "僅待審核的申請可以取消";
+            return RedirectToAction(nameof(Index));
+        }
+
+        leaveRequest.Status = LeaveStatus.Cancelled;
+        leaveRequest.DecisionNote = null;
+        leaveRequest.DecidedAt = null;
+
         await _context.SaveChangesAsync();
 
         return RedirectToAction(nameof(Index));
