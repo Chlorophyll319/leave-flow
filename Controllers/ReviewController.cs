@@ -66,6 +66,7 @@ public class ReviewController : Controller
 
         await _context.SaveChangesAsync();
 
+        TempData["SuccessMessage"] = decision == LeaveStatus.Approved ? "已核准該申請" : "已駁回該申請";
         return RedirectToAction(nameof(Index));
     }
 }
