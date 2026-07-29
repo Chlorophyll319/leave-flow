@@ -8,10 +8,6 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
 html {
   position: relative;
   min-height: 100%;
@@ -32,4 +28,302 @@ body {
 
 .validation-summary-valid {
   display: none;
+}
+
+/* ==========================================================================
+   LeaveFlow Design System — 色彩與字體 Token
+   ========================================================================== */
+
+:root {
+  --lf-bg: oklch(0.98 0.012 75);
+  --lf-surface: oklch(0.995 0.006 75);
+  --lf-border: oklch(0.9 0.01 75);
+  --lf-border-soft: oklch(0.94 0.01 75);
+  --lf-text: oklch(0.25 0.02 75);
+  --lf-text-secondary: oklch(0.5 0.02 75);
+  --lf-text-muted: oklch(0.55 0.02 75);
+  --lf-primary: oklch(0.62 0.16 45);
+  --lf-primary-hover: oklch(0.55 0.17 45);
+  --lf-primary-tint: oklch(0.94 0.04 45);
+  --lf-primary-link: oklch(0.55 0.16 45);
+  --lf-primary-ring: oklch(0.55 0.16 45 / 0.15);
+  --lf-primary-shadow: oklch(0.62 0.16 45 / 0.3);
+  --lf-danger: oklch(0.58 0.18 25);
+  --lf-danger-tint: oklch(0.95 0.03 25);
+  --lf-radius-sm: 12px;
+  --lf-radius-md: 16px;
+  --lf-radius-lg: 20px;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--lf-bg);
+  color: var(--lf-text);
+}
+
+h1, h2, h3, h4, .lf-heading {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--lf-text);
+}
+
+h1 { font-size: 30px; }
+h2 { font-size: 24px; font-weight: 700; }
+h3 { font-size: 20px; font-weight: 700; }
+
+a {
+  color: var(--lf-primary-link);
+}
+a:hover {
+  color: var(--lf-primary-hover);
+}
+
+/* ==========================================================================
+   按鈕 Buttons
+   ========================================================================== */
+
+.btn {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  border-radius: var(--lf-radius-sm);
+  padding: 10px 20px;
+}
+
+.btn-primary {
+  background: var(--lf-primary);
+  border-color: var(--lf-primary);
+  box-shadow: 0 2px 8px var(--lf-primary-shadow);
+}
+.btn-primary:hover,
+.btn-primary:focus {
+  background: var(--lf-primary-hover);
+  border-color: var(--lf-primary-hover);
+}
+
+.btn-secondary,
+.btn-outline-secondary {
+  background: white;
+  border-color: var(--lf-border);
+  color: var(--lf-text);
+}
+.btn-secondary:hover,
+.btn-outline-secondary:hover {
+  background: var(--lf-bg);
+  border-color: var(--lf-border);
+  color: var(--lf-text);
+}
+
+.btn-outline-primary {
+  background: transparent;
+  border-color: var(--lf-primary);
+  color: var(--lf-primary-link);
+}
+.btn-outline-primary:hover {
+  background: var(--lf-primary-tint);
+  border-color: var(--lf-primary);
+  color: var(--lf-primary-link);
+}
+
+.btn-danger {
+  background: var(--lf-danger);
+  border-color: var(--lf-danger);
+  color: white;
+}
+.btn-danger:hover {
+  background: oklch(0.5 0.19 25);
+  border-color: oklch(0.5 0.19 25);
+}
+
+.btn-outline-danger {
+  background: transparent;
+  border-color: var(--lf-danger);
+  color: var(--lf-danger);
+}
+.btn-outline-danger:hover {
+  background: var(--lf-danger);
+  border-color: var(--lf-danger);
+  color: white;
+}
+
+.btn:disabled,
+.btn.disabled {
+  background: oklch(0.92 0.01 75);
+  border-color: oklch(0.92 0.01 75);
+  color: oklch(0.65 0.02 75);
+  box-shadow: none;
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 3px var(--lf-primary-ring);
+}
+
+/* ==========================================================================
+   表單元件 Form Controls
+   ========================================================================== */
+
+.form-control,
+.form-select,
+textarea.form-control {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  border-radius: var(--lf-radius-sm);
+  border: 1px solid var(--lf-border);
+  background: var(--lf-bg);
+  color: var(--lf-text);
+  padding: 10px 14px;
+}
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--lf-primary);
+  box-shadow: 0 0 0 3px var(--lf-primary-ring);
+  background: white;
+}
+.form-control.is-invalid,
+.form-select.is-invalid {
+  border-color: var(--lf-danger);
+  background: var(--lf-danger-tint);
+}
+.form-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--lf-text);
+}
+.text-danger,
+.invalid-feedback,
+.field-validation-error {
+  color: var(--lf-danger) !important;
+  font-size: 13px;
+}
+.alert {
+  border: none;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 500;
+}
+.alert-danger {
+  background: var(--lf-danger-tint);
+  color: oklch(0.35 0.08 25);
+}
+.alert-success {
+  background: oklch(0.95 0.03 150);
+  color: oklch(0.3 0.07 150);
+}
+
+/* ==========================================================================
+   狀態標籤 Status Pill
+   ========================================================================== */
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.status-pill::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.status-pill-pending { background: oklch(0.96 0.03 70); color: oklch(0.35 0.05 70); }
+.status-pill-pending::before { background: oklch(0.7 0.15 70); }
+.status-pill-approved { background: oklch(0.95 0.03 150); color: oklch(0.3 0.06 150); }
+.status-pill-approved::before { background: oklch(0.6 0.14 150); }
+.status-pill-rejected { background: oklch(0.95 0.03 25); color: oklch(0.35 0.08 25); }
+.status-pill-rejected::before { background: oklch(0.58 0.18 25); }
+.status-pill-cancelled { background: oklch(0.94 0.01 75); color: oklch(0.4 0.01 75); }
+.status-pill-cancelled::before { background: oklch(0.6 0.01 75); }
+
+/* ==========================================================================
+   卡片 Card
+   ========================================================================== */
+
+.lf-card {
+  background: var(--lf-surface);
+  border: 1px solid var(--lf-border);
+  border-radius: var(--lf-radius-lg);
+  box-shadow: 0 1px 3px oklch(0.25 0.02 75 / 0.05);
+}
+
+/* ==========================================================================
+   空狀態 Empty State
+   ========================================================================== */
+
+.lf-empty-state {
+  background: white;
+  border: 1.5px dashed var(--lf-border);
+  border-radius: var(--lf-radius-lg);
+  padding: 56px 24px;
+  text-align: center;
+}
+.lf-empty-state-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--lf-primary-tint);
+  margin: 0 auto 16px;
+}
+.lf-empty-state-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: oklch(0.4 0.02 75);
+}
+
+/* ==========================================================================
+   導覽列 Navbar
+   ========================================================================== */
+
+.lf-navbar {
+  background: white;
+  border-bottom: 1px solid var(--lf-border);
+  box-shadow: none;
+}
+.lf-navbar-brand {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--lf-text) !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.lf-navbar-brand-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: var(--lf-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.lf-nav-link {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 16px;
+  border-radius: var(--lf-radius-sm);
+  color: var(--lf-text-secondary) !important;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.lf-nav-link:hover {
+  background: var(--lf-bg);
+  color: var(--lf-text) !important;
+}
+.lf-nav-link.active {
+  background: var(--lf-primary-tint);
+  color: var(--lf-primary-link) !important;
+}
+
+footer.footer {
+  border-top-color: var(--lf-border) !important;
+  color: var(--lf-text-secondary) !important;
 }
