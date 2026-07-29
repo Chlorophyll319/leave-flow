@@ -16,6 +16,11 @@
 
 <h1 class="mb-4">主管簽核</h1>
 
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+
 @if (TempData["ErrorMessage"] is string errorMessage)
 {
     <div class="alert alert-danger">@errorMessage</div>

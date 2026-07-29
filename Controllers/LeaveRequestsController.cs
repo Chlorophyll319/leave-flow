@@ -131,6 +131,7 @@ public class LeaveRequestsController : Controller
 
         await _context.SaveChangesAsync();
 
+        TempData["SuccessMessage"] = "申請已更新";
         return RedirectToAction(nameof(Index));
     }
 
@@ -169,6 +170,7 @@ public class LeaveRequestsController : Controller
         _context.LeaveRequests.Add(leaveRequest);
         await _context.SaveChangesAsync();
 
+        TempData["SuccessMessage"] = "申請已成功送出，狀態為待審核";
         return RedirectToAction(nameof(Index));
     }
 
@@ -195,6 +197,7 @@ public class LeaveRequestsController : Controller
 
         await _context.SaveChangesAsync();
 
+        TempData["SuccessMessage"] = "申請已取消";
         return RedirectToAction(nameof(Index));
     }
 
