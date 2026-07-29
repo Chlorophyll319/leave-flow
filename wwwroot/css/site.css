@@ -181,7 +181,9 @@ textarea.form-control {
   background: white;
 }
 .form-control.is-invalid,
-.form-select.is-invalid {
+.form-select.is-invalid,
+.form-control.input-validation-error,
+.form-select.input-validation-error {
   border-color: var(--lf-danger);
   background: var(--lf-danger-tint);
 }
