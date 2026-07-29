@@ -23,29 +23,30 @@
         _ => status.ToString()
     };
 
-    static string StatusBadgeClass(LeaveStatus status) => status switch
+    static string StatusPillClass(LeaveStatus status) => status switch
     {
-        LeaveStatus.Pending => "secondary",
-        LeaveStatus.Approved => "success",
-        LeaveStatus.Rejected => "danger",
-        LeaveStatus.Cancelled => "dark",
-        _ => "secondary"
+        LeaveStatus.Pending => "status-pill-pending",
+        LeaveStatus.Approved => "status-pill-approved",
+        LeaveStatus.Rejected => "status-pill-rejected",
+        LeaveStatus.Cancelled => "status-pill-cancelled",
+        _ => "status-pill-pending"
     };
 }
 
-<h1>請假申請清單</h1>
+<div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+    <h1 class="mb-0">請假申請清單</h1>
+    <div class="d-flex gap-2">
+        <a asp-controller="LeaveRequests" asp-action="Create" class="btn btn-primary">新增申請</a>
+        <a asp-controller="Review" asp-action="Index" class="btn btn-outline-primary">主管簽核</a>
+    </div>
+</div>
 
 @if (TempData["ErrorMessage"] is string errorMessage)
 {
     <div class="alert alert-danger">@errorMessage</div>
 }
 
-<p>
-    <a asp-controller="LeaveRequests" asp-action="Create" class="btn btn-primary">新增申請</a>
-    <a asp-controller="Review" asp-action="Index" class="btn btn-outline-primary">主管簽核</a>
-</p>
-
-<form asp-controller="LeaveRequests" asp-action="Index" method="get" class="mb-3 d-flex align-items-center gap-2">
+<form asp-controller="LeaveRequests" asp-action="Index" method="get" class="mb-4 d-flex align-items-center gap-2">
     <label for="statusFilter" class="form-label mb-0">狀態篩選</label>
     <select id="statusFilter" name="status" class="form-select w-auto" onchange="this.form.submit()">
         @foreach (var option in (IEnumerable<SelectListItem>)ViewData["StatusOptions"]!)
@@ -57,48 +58,48 @@
 
 @if (!Model.Any())
 {
-    <p>目前沒有請假申請</p>
+    <div class="lf-empty-state">
+        <div class="lf-empty-state-icon"></div>
+        <div class="lf-empty-state-text">目前沒有請假申請</div>
+    </div>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>員工姓名</th>
-                <th>部門</th>
-                <th>假別</th>
-                <th>開始日期</th>
-                <th>結束日期</th>
-                <th>請假天數</th>
-                <th>狀態</th>
-                <th>建立時間</th>
-                <th>操作</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.Employee?.Name</td>
-                    <td>@item.Employee?.Department</td>
-                    <td>@LeaveTypeLabel(item.LeaveType)</td>
-                    <td>@item.StartDate.ToString("yyyy-MM-dd")</td>
-                    <td>@item.EndDate.ToString("yyyy-MM-dd")</td>
-                    <td>@item.Days</td>
-                    <td><span class="badge bg-@StatusBadgeClass(item.Status)">@StatusLabel(item.Status)</span></td>
-                    <td>@TimeZoneInfo.ConvertTimeFromUtc(item.CreatedAt, taipeiZone).ToString("yyyy-MM-dd HH:mm") (UTC+8)</td>
-                    <td>
-                        <a asp-controller="LeaveRequests" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">詳細</a>
-                        @if (item.Status == LeaveStatus.Pending)
-                        {
-                            <a asp-controller="LeaveRequests" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">編輯</a>
-                            <form asp-controller="LeaveRequests" asp-action="Cancel" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('確定要取消這筆請假申請嗎？');">
-                                <button type="submit" class="btn btn-sm btn-outline-danger">取消</button>
-                            </form>
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="lf-card p-2">
+        <div class="d-none d-md-grid" style="grid-template-columns:1.2fr 1fr 1fr 1fr 1fr 0.8fr 1.2fr 1.2fr;padding:16px 20px;font-size:13px;font-weight:600;color:var(--lf-text-secondary);text-transform:uppercase;letter-spacing:0.03em">
+            <div>員工</div>
+            <div>假別</div>
+            <div>開始日期</div>
+            <div>結束日期</div>
+            <div>天數</div>
+            <div>狀態</div>
+            <div>建立時間</div>
+            <div>操作</div>
+        </div>
+        @foreach (var item in Model)
+        {
+            <div class="d-grid gap-1 d-md-grid" style="grid-template-columns:1.2fr 1fr 1fr 1fr 1fr 0.8fr 1.2fr 1.2fr;align-items:center;padding:18px 20px;border-top:1px solid var(--lf-border-soft)">
+                <div>
+                    <div class="fw-semibold" style="font-size:15px">@item.Employee?.Name</div>
+                    <div style="font-size:13px;color:var(--lf-text-muted)">@item.Employee?.Department</div>
+                </div>
+                <div style="font-size:15px">@LeaveTypeLabel(item.LeaveType)</div>
+                <div style="font-size:15px">@item.StartDate.ToString("yyyy-MM-dd")</div>
+                <div style="font-size:15px">@item.EndDate.ToString("yyyy-MM-dd")</div>
+                <div style="font-size:15px">@item.Days</div>
+                <div><span class="status-pill @StatusPillClass(item.Status)">@StatusLabel(item.Status)</span></div>
+                <div style="font-size:13px;color:var(--lf-text-muted)">@TimeZoneInfo.ConvertTimeFromUtc(item.CreatedAt, taipeiZone).ToString("yyyy-MM-dd HH:mm") (UTC+8)</div>
+                <div class="d-flex flex-wrap gap-2">
+                    <a asp-controller="LeaveRequests" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">詳細</a>
+                    @if (item.Status == LeaveStatus.Pending)
+                    {
+                        <a asp-controller="LeaveRequests" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">編輯</a>
+                        <form asp-controller="LeaveRequests" asp-action="Cancel" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('確定要取消這筆請假申請嗎？');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">取消</button>
+                        </form>
+                    }
+                </div>
+            </div>
+        }
+    </div>
 }
