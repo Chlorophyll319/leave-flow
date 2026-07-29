@@ -14,7 +14,7 @@
     };
 }
 
-<h1>主管簽核</h1>
+<h1 class="mb-4">主管簽核</h1>
 
 @if (TempData["ErrorMessage"] is string errorMessage)
 {
@@ -23,45 +23,45 @@
 
 @if (!Model.Any())
 {
-    <p>目前沒有待簽核的申請</p>
+    <div class="lf-empty-state">
+        <div class="lf-empty-state-icon"></div>
+        <div class="lf-empty-state-text">目前沒有待簽核的申請</div>
+    </div>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>員工姓名</th>
-                <th>部門</th>
-                <th>假別</th>
-                <th>開始日期</th>
-                <th>結束日期</th>
-                <th>請假天數</th>
-                <th>請假理由</th>
-                <th>建立時間</th>
-                <th>簽核</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.Employee?.Name</td>
-                    <td>@item.Employee?.Department</td>
-                    <td>@LeaveTypeLabel(item.LeaveType)</td>
-                    <td>@item.StartDate.ToString("yyyy-MM-dd")</td>
-                    <td>@item.EndDate.ToString("yyyy-MM-dd")</td>
-                    <td>@item.Days</td>
-                    <td>@item.Reason</td>
-                    <td>@TimeZoneInfo.ConvertTimeFromUtc(item.CreatedAt, taipeiZone).ToString("yyyy-MM-dd HH:mm") (UTC+8)</td>
-                    <td>
-                        <form asp-controller="Review" asp-action="Approve" asp-route-id="@item.Id" method="post" class="d-flex gap-2 align-items-start">
-                            <textarea name="note" maxlength="200" class="form-control form-control-sm" rows="1" placeholder="簽核備註（選填）"></textarea>
-                            <button type="submit" asp-action="Approve" asp-route-id="@item.Id" class="btn btn-sm btn-success text-nowrap">核准</button>
-                            <button type="submit" asp-action="Reject" asp-route-id="@item.Id" class="btn btn-sm btn-danger text-nowrap">駁回</button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="d-flex flex-column gap-3">
+        @foreach (var item in Model)
+        {
+            <div class="lf-card p-4">
+                <div class="d-flex flex-wrap gap-4 mb-3">
+                    <div>
+                        <div style="font-size:13px;font-weight:600;color:var(--lf-text-secondary)">員工</div>
+                        <div style="font-size:15px" class="fw-semibold">@item.Employee?.Name<span class="fw-normal" style="font-size:13px;color:var(--lf-text-muted)"> ・ @item.Employee?.Department</span></div>
+                    </div>
+                    <div>
+                        <div style="font-size:13px;font-weight:600;color:var(--lf-text-secondary)">假別</div>
+                        <div style="font-size:15px">@LeaveTypeLabel(item.LeaveType)</div>
+                    </div>
+                    <div>
+                        <div style="font-size:13px;font-weight:600;color:var(--lf-text-secondary)">期間</div>
+                        <div style="font-size:15px">@item.StartDate.ToString("yyyy-MM-dd") – @item.EndDate.ToString("yyyy-MM-dd")（@item.Days 天）</div>
+                    </div>
+                    <div>
+                        <div style="font-size:13px;font-weight:600;color:var(--lf-text-secondary)">建立時間</div>
+                        <div style="font-size:15px">@TimeZoneInfo.ConvertTimeFromUtc(item.CreatedAt, taipeiZone).ToString("yyyy-MM-dd HH:mm") (UTC+8)</div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div style="font-size:13px;font-weight:600;color:var(--lf-text-secondary)">請假理由</div>
+                    <div style="font-size:15px">@item.Reason</div>
+                </div>
+                <form asp-controller="Review" asp-action="Approve" asp-route-id="@item.Id" method="post" class="d-flex gap-2 align-items-start flex-wrap">
+                    <textarea name="note" maxlength="200" class="form-control" rows="1" placeholder="簽核備註（選填）" style="flex:1;min-width:200px"></textarea>
+                    <button type="submit" asp-action="Approve" asp-route-id="@item.Id" class="btn btn-primary text-nowrap">核准</button>
+                    <button type="submit" asp-action="Reject" asp-route-id="@item.Id" class="btn btn-outline-danger text-nowrap">駁回</button>
+                </form>
+            </div>
+        }
+    </div>
 }
