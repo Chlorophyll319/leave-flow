@@ -1,7 +1,7 @@
 @model List<LeaveRequest>
 
 @{
-    ViewData["Title"] = "請假申請清單";
+    ViewData["Title"] = "主管簽核";
     var taipeiZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Taipei");
 
     static string LeaveTypeLabel(LeaveType type) => type switch
@@ -12,32 +12,18 @@
         LeaveType.Other => "其他",
         _ => type.ToString()
     };
-
-    static string StatusLabel(LeaveStatus status) => status switch
-    {
-        LeaveStatus.Pending => "待審核",
-        LeaveStatus.Approved => "已核准",
-        LeaveStatus.Rejected => "已駁回",
-        LeaveStatus.Cancelled => "已取消",
-        _ => status.ToString()
-    };
 }
 
-<h1>請假申請清單</h1>
+<h1>主管簽核</h1>
 
 @if (TempData["ErrorMessage"] is string errorMessage)
 {
     <div class="alert alert-danger">@errorMessage</div>
 }
 
-<p>
-    <a asp-controller="LeaveRequests" asp-action="Create" class="btn btn-primary">新增申請</a>
-    <a asp-controller="Review" asp-action="Index" class="btn btn-outline-primary">主管簽核</a>
-</p>
-
 @if (!Model.Any())
 {
-    <p>目前沒有請假申請</p>
+    <p>目前沒有待簽核的申請</p>
 }
 else
 {
@@ -50,9 +36,9 @@ else
                 <th>開始日期</th>
                 <th>結束日期</th>
                 <th>請假天數</th>
-                <th>狀態</th>
+                <th>請假理由</th>
                 <th>建立時間</th>
-                <th>操作</th>
+                <th>簽核</th>
             </tr>
         </thead>
         <tbody>
@@ -65,17 +51,14 @@ else
                     <td>@item.StartDate.ToString("yyyy-MM-dd")</td>
                     <td>@item.EndDate.ToString("yyyy-MM-dd")</td>
                     <td>@item.Days</td>
-                    <td>@StatusLabel(item.Status)</td>
+                    <td>@item.Reason</td>
                     <td>@TimeZoneInfo.ConvertTimeFromUtc(item.CreatedAt, taipeiZone).ToString("yyyy-MM-dd HH:mm") (UTC+8)</td>
                     <td>
-                        <a asp-controller="LeaveRequests" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">詳細</a>
-                        @if (item.Status == LeaveStatus.Pending)
-                        {
-                            <a asp-controller="LeaveRequests" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">編輯</a>
-                            <form asp-controller="LeaveRequests" asp-action="Cancel" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('確定要取消這筆請假申請嗎？');">
-                                <button type="submit" class="btn btn-sm btn-outline-danger">取消</button>
-                            </form>
-                        }
+                        <form asp-controller="Review" asp-action="Approve" asp-route-id="@item.Id" method="post" class="d-flex gap-2 align-items-start">
+                            <textarea name="note" maxlength="200" class="form-control form-control-sm" rows="1" placeholder="簽核備註（選填）"></textarea>
+                            <button type="submit" asp-action="Approve" asp-route-id="@item.Id" class="btn btn-sm btn-success text-nowrap">核准</button>
+                            <button type="submit" asp-action="Reject" asp-route-id="@item.Id" class="btn btn-sm btn-danger text-nowrap">駁回</button>
+                        </form>
                     </td>
                 </tr>
             }
