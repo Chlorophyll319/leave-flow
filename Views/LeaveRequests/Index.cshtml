@@ -1,3 +1,4 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
 @model List<LeaveRequest>
 
 @{
@@ -34,6 +35,16 @@
     <a asp-controller="LeaveRequests" asp-action="Create" class="btn btn-primary">新增申請</a>
     <a asp-controller="Review" asp-action="Index" class="btn btn-outline-primary">主管簽核</a>
 </p>
+
+<form asp-controller="LeaveRequests" asp-action="Index" method="get" class="mb-3 d-flex align-items-center gap-2">
+    <label for="statusFilter" class="form-label mb-0">狀態篩選</label>
+    <select id="statusFilter" name="status" class="form-select w-auto" onchange="this.form.submit()">
+        @foreach (var option in (IEnumerable<SelectListItem>)ViewData["StatusOptions"]!)
+        {
+            <option value="@option.Value" selected="@option.Selected">@option.Text</option>
+        }
+    </select>
+</form>
 
 @if (!Model.Any())
 {

@@ -16,12 +16,24 @@ public class LeaveRequestsController : Controller
         _context = context;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(LeaveStatus? status)
     {
-        var leaveRequests = await _context.LeaveRequests
+        var validStatus = status.HasValue && Enum.IsDefined(status.Value) ? status : null;
+
+        var query = _context.LeaveRequests
             .Include(r => r.Employee)
+            .AsQueryable();
+
+        if (validStatus.HasValue)
+        {
+            query = query.Where(r => r.Status == validStatus.Value);
+        }
+
+        var leaveRequests = await query
             .OrderByDescending(r => r.CreatedAt)
             .ToListAsync();
+
+        ViewData["StatusOptions"] = GetStatusFilterOptions(validStatus);
 
         return View(leaveRequests);
     }
@@ -202,6 +214,18 @@ public class LeaveRequestsController : Controller
             new SelectListItem("病假", ((int)LeaveType.Sick).ToString()),
             new SelectListItem("事假", ((int)LeaveType.Personal).ToString()),
             new SelectListItem("其他", ((int)LeaveType.Other).ToString())
+        ];
+    }
+
+    private static IEnumerable<SelectListItem> GetStatusFilterOptions(LeaveStatus? selected)
+    {
+        return
+        [
+            new SelectListItem("全部", "") { Selected = selected is null },
+            new SelectListItem("待審核", ((int)LeaveStatus.Pending).ToString()) { Selected = selected == LeaveStatus.Pending },
+            new SelectListItem("已核准", ((int)LeaveStatus.Approved).ToString()) { Selected = selected == LeaveStatus.Approved },
+            new SelectListItem("已駁回", ((int)LeaveStatus.Rejected).ToString()) { Selected = selected == LeaveStatus.Rejected },
+            new SelectListItem("已取消", ((int)LeaveStatus.Cancelled).ToString()) { Selected = selected == LeaveStatus.Cancelled }
         ];
     }
 }
