@@ -40,11 +40,14 @@
 - .NET 10 SDK 以上
 - 一組可用的 [Neon](https://neon.tech) PostgreSQL 連線字串（或其他 PostgreSQL 服務）
 
-### 1. 還原本機工具（EF Core CLI）
+### 1. 還原套件與本機工具
 
 ```bash
+dotnet restore
 dotnet tool restore
 ```
+
+> `dotnet ef` 需要先有 `dotnet restore` 產生的 `project.assets.json`，否則會噴 `NETSDK1004` 錯誤；純 clone 下來的專案務必先執行這步。
 
 ### 2. 設定連線字串（User Secrets）
 
