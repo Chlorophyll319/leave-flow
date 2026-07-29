@@ -21,6 +21,15 @@
         LeaveStatus.Cancelled => "已取消",
         _ => status.ToString()
     };
+
+    static string StatusBadgeClass(LeaveStatus status) => status switch
+    {
+        LeaveStatus.Pending => "secondary",
+        LeaveStatus.Approved => "success",
+        LeaveStatus.Rejected => "danger",
+        LeaveStatus.Cancelled => "dark",
+        _ => "secondary"
+    };
 }
 
 <h1>請假申請詳細資料</h1>
@@ -48,7 +57,7 @@
     <dd class="col-sm-9">@Model.Reason</dd>
 
     <dt class="col-sm-3">狀態</dt>
-    <dd class="col-sm-9">@StatusLabel(Model.Status)</dd>
+    <dd class="col-sm-9"><span class="badge bg-@StatusBadgeClass(Model.Status)">@StatusLabel(Model.Status)</span></dd>
 
     <dt class="col-sm-3">建立時間</dt>
     <dd class="col-sm-9">@TimeZoneInfo.ConvertTimeFromUtc(Model.CreatedAt, taipeiZone).ToString("yyyy-MM-dd HH:mm") (UTC+8)</dd>
