@@ -22,61 +22,78 @@
         _ => status.ToString()
     };
 
-    static string StatusBadgeClass(LeaveStatus status) => status switch
+    static string StatusPillClass(LeaveStatus status) => status switch
     {
-        LeaveStatus.Pending => "secondary",
-        LeaveStatus.Approved => "success",
-        LeaveStatus.Rejected => "danger",
-        LeaveStatus.Cancelled => "dark",
-        _ => "secondary"
+        LeaveStatus.Pending => "status-pill-pending",
+        LeaveStatus.Approved => "status-pill-approved",
+        LeaveStatus.Rejected => "status-pill-rejected",
+        LeaveStatus.Cancelled => "status-pill-cancelled",
+        _ => "status-pill-pending"
     };
 }
 
-<h1>請假申請詳細資料</h1>
+<h1 class="mb-4">請假申請詳細資料</h1>
 
-<dl class="row">
-    <dt class="col-sm-3">員工姓名</dt>
-    <dd class="col-sm-9">@Model.Employee?.Name</dd>
+<div class="lf-card p-4" style="max-width:720px">
+    <div class="d-grid gap-3" style="grid-template-columns:1fr 1fr">
+        <div>
+            <div style="font-size:13px;font-weight:600;color:var(--lf-text-secondary)">員工姓名</div>
+            <div style="font-size:15px">@Model.Employee?.Name</div>
+        </div>
+        <div>
+            <div style="font-size:13px;font-weight:600;color:var(--lf-text-secondary)">部門</div>
+            <div style="font-size:15px">@Model.Employee?.Department</div>
+        </div>
+        <div>
+            <div style="font-size:13px;font-weight:600;color:var(--lf-text-secondary)">假別</div>
+            <div style="font-size:15px">@LeaveTypeLabel(Model.LeaveType)</div>
+        </div>
+        <div>
+            <div style="font-size:13px;font-weight:600;color:var(--lf-text-secondary)">狀態</div>
+            <div><span class="status-pill @StatusPillClass(Model.Status)">@StatusLabel(Model.Status)</span></div>
+        </div>
+        <div>
+            <div style="font-size:13px;font-weight:600;color:var(--lf-text-secondary)">開始日期</div>
+            <div style="font-size:15px">@Model.StartDate.ToString("yyyy-MM-dd")</div>
+        </div>
+        <div>
+            <div style="font-size:13px;font-weight:600;color:var(--lf-text-secondary)">結束日期</div>
+            <div style="font-size:15px">@Model.EndDate.ToString("yyyy-MM-dd")</div>
+        </div>
+        <div>
+            <div style="font-size:13px;font-weight:600;color:var(--lf-text-secondary)">請假天數</div>
+            <div style="font-size:15px">@Model.Days</div>
+        </div>
+        <div>
+            <div style="font-size:13px;font-weight:600;color:var(--lf-text-secondary)">建立時間</div>
+            <div style="font-size:15px">@TimeZoneInfo.ConvertTimeFromUtc(Model.CreatedAt, taipeiZone).ToString("yyyy-MM-dd HH:mm") (UTC+8)</div>
+        </div>
+        <div style="grid-column:1 / -1">
+            <div style="font-size:13px;font-weight:600;color:var(--lf-text-secondary)">請假理由</div>
+            <div style="font-size:15px">@Model.Reason</div>
+        </div>
 
-    <dt class="col-sm-3">部門</dt>
-    <dd class="col-sm-9">@Model.Employee?.Department</dd>
+        @if (Model.Status is LeaveStatus.Approved or LeaveStatus.Rejected)
+        {
+            <div>
+                <div style="font-size:13px;font-weight:600;color:var(--lf-text-secondary)">簽核備註</div>
+                <div style="font-size:15px">@Model.DecisionNote</div>
+            </div>
+            <div>
+                <div style="font-size:13px;font-weight:600;color:var(--lf-text-secondary)">簽核時間</div>
+                <div style="font-size:15px">@TimeZoneInfo.ConvertTimeFromUtc(Model.DecidedAt!.Value, taipeiZone).ToString("yyyy-MM-dd HH:mm") (UTC+8)</div>
+            </div>
+        }
+    </div>
+</div>
 
-    <dt class="col-sm-3">假別</dt>
-    <dd class="col-sm-9">@LeaveTypeLabel(Model.LeaveType)</dd>
-
-    <dt class="col-sm-3">開始日期</dt>
-    <dd class="col-sm-9">@Model.StartDate.ToString("yyyy-MM-dd")</dd>
-
-    <dt class="col-sm-3">結束日期</dt>
-    <dd class="col-sm-9">@Model.EndDate.ToString("yyyy-MM-dd")</dd>
-
-    <dt class="col-sm-3">請假天數</dt>
-    <dd class="col-sm-9">@Model.Days</dd>
-
-    <dt class="col-sm-3">請假理由</dt>
-    <dd class="col-sm-9">@Model.Reason</dd>
-
-    <dt class="col-sm-3">狀態</dt>
-    <dd class="col-sm-9"><span class="badge bg-@StatusBadgeClass(Model.Status)">@StatusLabel(Model.Status)</span></dd>
-
-    <dt class="col-sm-3">建立時間</dt>
-    <dd class="col-sm-9">@TimeZoneInfo.ConvertTimeFromUtc(Model.CreatedAt, taipeiZone).ToString("yyyy-MM-dd HH:mm") (UTC+8)</dd>
-
-    @if (Model.Status is LeaveStatus.Approved or LeaveStatus.Rejected)
+<div class="d-flex gap-2 mt-4">
+    @if (Model.Status == LeaveStatus.Pending)
     {
-        <dt class="col-sm-3">簽核備註</dt>
-        <dd class="col-sm-9">@Model.DecisionNote</dd>
-
-        <dt class="col-sm-3">簽核時間</dt>
-        <dd class="col-sm-9">@TimeZoneInfo.ConvertTimeFromUtc(Model.DecidedAt!.Value, taipeiZone).ToString("yyyy-MM-dd HH:mm") (UTC+8)</dd>
+        <a asp-controller="LeaveRequests" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">編輯</a>
+        <form asp-controller="LeaveRequests" asp-action="Cancel" asp-route-id="@Model.Id" method="post" class="d-inline" onsubmit="return confirm('確定要取消這筆請假申請嗎？');">
+            <button type="submit" class="btn btn-danger">取消</button>
+        </form>
     }
-</dl>
-
-@if (Model.Status == LeaveStatus.Pending)
-{
-    <a asp-controller="LeaveRequests" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">編輯</a>
-    <form asp-controller="LeaveRequests" asp-action="Cancel" asp-route-id="@Model.Id" method="post" class="d-inline" onsubmit="return confirm('確定要取消這筆請假申請嗎？');">
-        <button type="submit" class="btn btn-danger">取消</button>
-    </form>
-}
-<a asp-controller="LeaveRequests" asp-action="Index" class="btn btn-secondary">返回清單</a>
+    <a asp-controller="LeaveRequests" asp-action="Index" class="btn btn-secondary">返回清單</a>
+</div>
