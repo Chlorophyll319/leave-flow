@@ -51,10 +51,17 @@
     <div class="alert alert-danger">@errorMessage</div>
 }
 
-<form asp-controller="LeaveRequests" asp-action="Index" method="get" class="mb-4 d-flex align-items-center gap-2">
+<form asp-controller="LeaveRequests" asp-action="Index" method="get" class="mb-4 d-flex align-items-center flex-wrap gap-2">
     <label for="statusFilter" class="form-label mb-0">狀態篩選</label>
     <select id="statusFilter" name="status" class="form-select w-auto" onchange="this.form.submit()">
         @foreach (var option in (IEnumerable<SelectListItem>)ViewData["StatusOptions"]!)
+        {
+            <option value="@option.Value" selected="@option.Selected">@option.Text</option>
+        }
+    </select>
+    <label for="sortFilter" class="form-label mb-0">排序</label>
+    <select id="sortFilter" name="sort" class="form-select w-auto" onchange="this.form.submit()">
+        @foreach (var option in (IEnumerable<SelectListItem>)ViewData["SortOptions"]!)
         {
             <option value="@option.Value" selected="@option.Selected">@option.Text</option>
         }
