@@ -51,10 +51,17 @@
     <div class="alert alert-danger">@errorMessage</div>
 }
 
-<form asp-controller="LeaveRequests" asp-action="Index" method="get" class="mb-4 d-flex align-items-center gap-2">
+<form asp-controller="LeaveRequests" asp-action="Index" method="get" class="mb-4 d-flex align-items-center flex-wrap gap-2">
     <label for="statusFilter" class="form-label mb-0">狀態篩選</label>
     <select id="statusFilter" name="status" class="form-select w-auto" onchange="this.form.submit()">
         @foreach (var option in (IEnumerable<SelectListItem>)ViewData["StatusOptions"]!)
+        {
+            <option value="@option.Value" selected="@option.Selected">@option.Text</option>
+        }
+    </select>
+    <label for="sortFilter" class="form-label mb-0">排序</label>
+    <select id="sortFilter" name="sort" class="form-select w-auto" onchange="this.form.submit()">
+        @foreach (var option in (IEnumerable<SelectListItem>)ViewData["SortOptions"]!)
         {
             <option value="@option.Value" selected="@option.Selected">@option.Text</option>
         }
@@ -83,7 +90,44 @@ else
         </div>
         @foreach (var item in Model)
         {
-            <div class="d-grid gap-1 d-md-grid" style="grid-template-columns:1.2fr 1fr 1fr 1fr 1fr 0.8fr 1.2fr 1.2fr;align-items:center;padding:18px 20px;border-top:1px solid var(--lf-border-soft)">
+            <div class="lf-leave-mobile-card d-md-none">
+                <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                    <div>
+                        <div class="fw-semibold" style="font-size:15px">@item.Employee?.Name</div>
+                        <div style="font-size:13px;color:var(--lf-text-muted)">@item.Employee?.Department</div>
+                    </div>
+                    <span class="status-pill @StatusPillClass(item.Status)">@StatusLabel(item.Status)</span>
+                </div>
+                <div class="d-grid gap-2" style="grid-template-columns:1fr 1fr">
+                    <div>
+                        <div class="lf-leave-mobile-card-label">假別</div>
+                        <div style="font-size:15px">@LeaveTypeLabel(item.LeaveType)</div>
+                    </div>
+                    <div>
+                        <div class="lf-leave-mobile-card-label">天數</div>
+                        <div style="font-size:15px">@item.Days</div>
+                    </div>
+                    <div style="grid-column:1 / -1">
+                        <div class="lf-leave-mobile-card-label">期間</div>
+                        <div style="font-size:15px">@item.StartDate.ToString("yyyy-MM-dd") ~ @item.EndDate.ToString("yyyy-MM-dd")</div>
+                    </div>
+                    <div style="grid-column:1 / -1">
+                        <div class="lf-leave-mobile-card-label">建立時間</div>
+                        <div style="font-size:13px;color:var(--lf-text-muted)">@TimeZoneInfo.ConvertTimeFromUtc(item.CreatedAt, taipeiZone).ToString("yyyy-MM-dd HH:mm") (UTC+8)</div>
+                    </div>
+                </div>
+                <div class="d-flex flex-wrap gap-2 mt-3">
+                    <a asp-controller="LeaveRequests" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">詳細</a>
+                    @if (item.Status == LeaveStatus.Pending)
+                    {
+                        <a asp-controller="LeaveRequests" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">編輯</a>
+                        <form asp-controller="LeaveRequests" asp-action="Cancel" asp-route-id="@item.Id" method="post" class="d-inline">
+                            <button type="button" class="btn btn-sm btn-outline-danger" data-cancel-modal-trigger>取消</button>
+                        </form>
+                    }
+                </div>
+            </div>
+            <div class="d-none d-md-grid gap-1" style="grid-template-columns:1.2fr 1fr 1fr 1fr 1fr 0.8fr 1.2fr 1.2fr;align-items:center;padding:18px 20px;border-top:1px solid var(--lf-border-soft)">
                 <div>
                     <div class="fw-semibold" style="font-size:15px">@item.Employee?.Name</div>
                     <div style="font-size:13px;color:var(--lf-text-muted)">@item.Employee?.Department</div>

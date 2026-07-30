@@ -255,6 +255,27 @@ textarea.form-control {
 }
 
 /* ==========================================================================
+   清單頁手機卡片 Mobile List Card（P1）
+   ========================================================================== */
+
+.lf-leave-mobile-card {
+  padding: 16px 4px;
+  border-top: 1px solid var(--lf-border-soft);
+  overflow-wrap: anywhere;
+}
+.lf-leave-mobile-card-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lf-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 2px;
+}
+.lf-leave-mobile-card .btn-sm {
+  padding: 8px 14px;
+}
+
+/* ==========================================================================
    空狀態 Empty State
    ========================================================================== */
 

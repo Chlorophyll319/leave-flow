@@ -16,9 +16,10 @@ public class LeaveRequestsController : Controller
         _context = context;
     }
 
-    public async Task<IActionResult> Index(LeaveStatus? status)
+    public async Task<IActionResult> Index(LeaveStatus? status, string? sort)
     {
         var validStatus = status.HasValue && Enum.IsDefined(status.Value) ? status : null;
+        var normalizedSort = string.Equals(sort, "asc", StringComparison.OrdinalIgnoreCase) ? "asc" : "desc";
 
         var query = _context.LeaveRequests
             .Include(r => r.Employee)
@@ -29,11 +30,14 @@ public class LeaveRequestsController : Controller
             query = query.Where(r => r.Status == validStatus.Value);
         }
 
-        var leaveRequests = await query
-            .OrderByDescending(r => r.CreatedAt)
-            .ToListAsync();
+        query = normalizedSort == "asc"
+            ? query.OrderBy(r => r.CreatedAt).ThenBy(r => r.Id)
+            : query.OrderByDescending(r => r.CreatedAt).ThenByDescending(r => r.Id);
+
+        var leaveRequests = await query.ToListAsync();
 
         ViewData["StatusOptions"] = GetStatusFilterOptions(validStatus);
+        ViewData["SortOptions"] = GetSortOptions(normalizedSort);
 
         return View(leaveRequests);
     }
@@ -229,6 +233,15 @@ public class LeaveRequestsController : Controller
             new SelectListItem("已核准", ((int)LeaveStatus.Approved).ToString()) { Selected = selected == LeaveStatus.Approved },
             new SelectListItem("已駁回", ((int)LeaveStatus.Rejected).ToString()) { Selected = selected == LeaveStatus.Rejected },
             new SelectListItem("已取消", ((int)LeaveStatus.Cancelled).ToString()) { Selected = selected == LeaveStatus.Cancelled }
+        ];
+    }
+
+    private static IEnumerable<SelectListItem> GetSortOptions(string sort)
+    {
+        return
+        [
+            new SelectListItem("建立時間：新到舊", "desc") { Selected = sort == "desc" },
+            new SelectListItem("建立時間：舊到新", "asc") { Selected = sort == "asc" }
         ];
     }
 }
