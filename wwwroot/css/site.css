@@ -329,3 +329,64 @@ footer.footer {
   border-top-color: var(--lf-border) !important;
   color: var(--lf-text-secondary) !important;
 }
+
+/* ==========================================================================
+   取消確認 Modal
+   ========================================================================== */
+
+.lf-modal {
+  border: none;
+  border-radius: var(--lf-radius-lg);
+  padding: 32px;
+  width: 90vw;
+  max-width: 400px;
+  box-sizing: border-box;
+  box-shadow: 0 12px 40px oklch(0.2 0.02 75 / 0.2);
+  background: white;
+  color: var(--lf-text);
+}
+.lf-modal[open] {
+  animation: lf-modal-scale-in 0.25s ease both;
+}
+.lf-modal::backdrop {
+  background: oklch(0.2 0.02 75 / 0.4);
+  animation: lf-modal-fade-in 0.2s ease both;
+}
+.lf-modal-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--lf-danger-tint);
+  color: var(--lf-danger);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.lf-modal-title {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 12px;
+  color: var(--lf-text);
+}
+.lf-modal-message {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--lf-text-muted);
+  margin-bottom: 24px;
+}
+.lf-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+@keyframes lf-modal-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes lf-modal-scale-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
