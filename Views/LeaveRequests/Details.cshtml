@@ -89,7 +89,7 @@
             </div>
             <div>
                 <div style="font-size:13px;font-weight:600;color:var(--lf-text-secondary)">簽核時間</div>
-                <div style="font-size:15px">@TimeZoneInfo.ConvertTimeFromUtc(Model.DecidedAt!.Value, taipeiZone).ToString("yyyy-MM-dd HH:mm") (UTC+8)</div>
+                <div style="font-size:15px">@(Model.DecidedAt.HasValue ? TimeZoneInfo.ConvertTimeFromUtc(Model.DecidedAt.Value, taipeiZone).ToString("yyyy-MM-dd HH:mm") + " (UTC+8)" : "-")</div>
             </div>
         }
     </div>
