@@ -125,8 +125,14 @@ a:hover {
   border-color: var(--lf-primary);
   color: var(--lf-primary-link);
 }
+.btn-check + .btn-outline-primary:hover {
+  background: var(--lf-primary-tint);
+  border-color: var(--lf-primary);
+  color: var(--lf-primary-link);
+}
 .btn-check:checked + .btn-outline-primary,
-.btn-check:active + .btn-outline-primary {
+.btn-check:active + .btn-outline-primary,
+.btn-check:checked + .btn-outline-primary:hover {
   background: var(--lf-primary);
   border-color: var(--lf-primary);
   color: white;
