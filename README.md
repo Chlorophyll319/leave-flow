@@ -87,6 +87,9 @@ LeaveRequest
 ├─ LeaveType    int           NOT NULL（enum：Annual/Sick/Personal/Other）
 ├─ StartDate    date          NOT NULL
 ├─ EndDate      date          NOT NULL
+├─ IsHourly     boolean       NOT NULL, default false
+├─ StartTime    time          NULL（以小時計時必填）
+├─ EndTime      time          NULL（以小時計時必填）
 ├─ Reason       varchar(200)  NOT NULL
 ├─ Status       int           NOT NULL, default Pending（enum，Pending = 0）
 ├─ CreatedAt    timestamptz   NOT NULL（UTC）
@@ -94,7 +97,7 @@ LeaveRequest
 └─ DecidedAt    timestamptz   NULL（UTC）
 ```
 
-請假天數不存欄位，執行時以 `EndDate.DayNumber - StartDate.DayNumber + 1` 計算（曆天數含頭尾）。
+請假天數不存欄位，執行時以 `EndDate.DayNumber - StartDate.DayNumber + 1` 計算（曆天數含頭尾）。以小時計時改以 `Hours` 唯讀屬性計算時數（以 0.5 小時為最小單位四捨五入），依 `IsHourly` 決定顯示天數或時數。
 
 ## 狀態流轉圖
 
