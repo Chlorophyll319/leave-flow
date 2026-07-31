@@ -125,6 +125,12 @@ a:hover {
   border-color: var(--lf-primary);
   color: var(--lf-primary-link);
 }
+.btn-check:checked + .btn-outline-primary,
+.btn-check:active + .btn-outline-primary {
+  background: var(--lf-primary);
+  border-color: var(--lf-primary);
+  color: white;
+}
 
 .btn-danger {
   background: var(--lf-danger);
@@ -156,6 +162,12 @@ a:hover {
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 3px var(--lf-primary-ring);
+}
+.btn-check:focus-visible + .btn-outline-primary,
+.btn-check:focus + .btn-outline-primary,
+.btn-check:checked:focus-visible + .btn-outline-primary,
+.btn-check:checked + .btn-outline-primary:focus-visible {
   box-shadow: 0 0 0 3px var(--lf-primary-ring);
 }
 
