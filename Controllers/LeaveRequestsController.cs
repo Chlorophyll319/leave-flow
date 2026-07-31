@@ -60,7 +60,7 @@ public class LeaveRequestsController : Controller
     {
         ViewData["Employees"] = await GetEmployeeOptionsAsync();
         ViewData["LeaveTypes"] = GetLeaveTypeOptions();
-        return View();
+        return View(new LeaveRequestFormViewModel());
     }
 
     public async Task<IActionResult> Edit(int id)
@@ -86,6 +86,9 @@ public class LeaveRequestsController : Controller
             LeaveType = leaveRequest.LeaveType,
             StartDate = leaveRequest.StartDate,
             EndDate = leaveRequest.EndDate,
+            IsHourly = leaveRequest.IsHourly,
+            StartTime = leaveRequest.StartTime,
+            EndTime = leaveRequest.EndTime,
             Reason = leaveRequest.Reason
         };
 
@@ -131,6 +134,9 @@ public class LeaveRequestsController : Controller
         leaveRequest.LeaveType = vm.LeaveType!.Value;
         leaveRequest.StartDate = vm.StartDate!.Value;
         leaveRequest.EndDate = vm.EndDate!.Value;
+        leaveRequest.IsHourly = vm.IsHourly;
+        leaveRequest.StartTime = vm.IsHourly ? vm.StartTime : null;
+        leaveRequest.EndTime = vm.IsHourly ? vm.EndTime : null;
         leaveRequest.Reason = vm.Reason!;
 
         await _context.SaveChangesAsync();
@@ -166,6 +172,9 @@ public class LeaveRequestsController : Controller
             LeaveType = vm.LeaveType!.Value,
             StartDate = vm.StartDate!.Value,
             EndDate = vm.EndDate!.Value,
+            IsHourly = vm.IsHourly,
+            StartTime = vm.IsHourly ? vm.StartTime : null,
+            EndTime = vm.IsHourly ? vm.EndTime : null,
             Reason = vm.Reason!,
             Status = LeaveStatus.Pending,
             CreatedAt = DateTime.UtcNow
