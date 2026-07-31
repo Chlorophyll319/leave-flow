@@ -30,6 +30,14 @@
         LeaveStatus.Cancelled => "status-pill-cancelled",
         _ => "status-pill-pending"
     };
+
+    static string FormatHours(double hours) => hours % 1 == 0 ? ((int)hours).ToString() : hours.ToString("0.#");
+
+    static string DurationLabel(LeaveRequest r) => r.IsHourly ? $"{FormatHours(r.Hours)} 小時" : $"{r.Days} 天";
+
+    static string DateCell(DateOnly date, TimeOnly? time) => time.HasValue
+        ? $"{date:yyyy-MM-dd} {time:HH:mm}"
+        : date.ToString("yyyy-MM-dd");
 }
 
 <h1 class="mb-4">請假申請詳細資料</h1>
@@ -54,15 +62,15 @@
         </div>
         <div>
             <div style="font-size:13px;font-weight:600;color:var(--lf-text-secondary)">開始日期</div>
-            <div style="font-size:15px">@Model.StartDate.ToString("yyyy-MM-dd")</div>
+            <div style="font-size:15px">@DateCell(Model.StartDate, Model.IsHourly ? Model.StartTime : null)</div>
         </div>
         <div>
             <div style="font-size:13px;font-weight:600;color:var(--lf-text-secondary)">結束日期</div>
-            <div style="font-size:15px">@Model.EndDate.ToString("yyyy-MM-dd")</div>
+            <div style="font-size:15px">@DateCell(Model.EndDate, Model.IsHourly ? Model.EndTime : null)</div>
         </div>
         <div>
-            <div style="font-size:13px;font-weight:600;color:var(--lf-text-secondary)">請假天數</div>
-            <div style="font-size:15px">@Model.Days</div>
+            <div style="font-size:13px;font-weight:600;color:var(--lf-text-secondary)">時長</div>
+            <div style="font-size:15px">@DurationLabel(Model)</div>
         </div>
         <div>
             <div style="font-size:13px;font-weight:600;color:var(--lf-text-secondary)">建立時間</div>

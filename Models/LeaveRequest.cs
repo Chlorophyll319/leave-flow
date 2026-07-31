@@ -32,6 +32,12 @@ public class LeaveRequest
 
     public DateOnly EndDate { get; set; }
 
+    public bool IsHourly { get; set; }
+
+    public TimeOnly? StartTime { get; set; }
+
+    public TimeOnly? EndTime { get; set; }
+
     [Required]
     [MaxLength(200)]
     public string Reason { get; set; } = string.Empty;
@@ -47,4 +53,15 @@ public class LeaveRequest
 
     // 曆天數含頭尾；DateOnly 沒有減法運算子，須用 DayNumber 相減
     public int Days => EndDate.DayNumber - StartDate.DayNumber + 1;
+
+    // 以小時計時長；四捨五入至 0.5 小時
+    public double Hours
+    {
+        get
+        {
+            var start = StartDate.ToDateTime(StartTime ?? TimeOnly.MinValue);
+            var end = EndDate.ToDateTime(EndTime ?? TimeOnly.MinValue);
+            return Math.Round((end - start).TotalHours * 2, MidpointRounding.AwayFromZero) / 2;
+        }
+    }
 }

@@ -12,6 +12,14 @@
         LeaveType.Other => "其他",
         _ => type.ToString()
     };
+
+    static string FormatHours(double hours) => hours % 1 == 0 ? ((int)hours).ToString() : hours.ToString("0.#");
+
+    static string DurationLabel(LeaveRequest r) => r.IsHourly ? $"{FormatHours(r.Hours)} 小時" : $"{r.Days} 天";
+
+    static string DateCell(DateOnly date, TimeOnly? time) => time.HasValue
+        ? $"{date:yyyy-MM-dd} {time:HH:mm}"
+        : date.ToString("yyyy-MM-dd");
 }
 
 <h1 class="mb-4">主管簽核</h1>
@@ -50,7 +58,7 @@ else
                     </div>
                     <div>
                         <div style="font-size:13px;font-weight:600;color:var(--lf-text-secondary)">期間</div>
-                        <div style="font-size:15px">@item.StartDate.ToString("yyyy-MM-dd") – @item.EndDate.ToString("yyyy-MM-dd")（@item.Days 天）</div>
+                        <div style="font-size:15px">@DateCell(item.StartDate, item.IsHourly ? item.StartTime : null) – @DateCell(item.EndDate, item.IsHourly ? item.EndTime : null)（@DurationLabel(item)）</div>
                     </div>
                     <div>
                         <div style="font-size:13px;font-weight:600;color:var(--lf-text-secondary)">建立時間</div>

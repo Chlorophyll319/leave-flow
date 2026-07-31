@@ -38,3 +38,24 @@
     }
   });
 })();
+
+(function () {
+  var toggles = document.querySelectorAll('[data-hourly-toggle]');
+  if (!toggles.length) {
+    return;
+  }
+
+  function syncHourlyFields() {
+    var checked = document.querySelector('[data-hourly-toggle]:checked');
+    var isHourly = !!checked && checked.value === 'true';
+    document.querySelectorAll('[data-hourly-fields]').forEach(function (el) {
+      el.style.display = isHourly ? '' : 'none';
+    });
+  }
+
+  toggles.forEach(function (toggle) {
+    toggle.addEventListener('change', syncHourlyFields);
+  });
+
+  syncHourlyFields();
+})();
