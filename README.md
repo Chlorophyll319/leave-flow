@@ -73,6 +73,14 @@ dotnet run
 
 預設網址：`http://localhost:5272`（HTTPS：`https://localhost:7211`）。開啟後會導向請假申請清單頁 `/LeaveRequests`。
 
+## 測試
+
+測試專案位於 `tests/LeaveFlow.Tests`（xUnit + EF Core InMemory Provider），涵蓋 ViewModel／Model 純邏輯、Controller 表單防竄改與狀態守衛、簽核流程與重複簽核防護。
+
+```bash
+dotnet test
+```
+
 ## 資料模型說明
 
 ```
