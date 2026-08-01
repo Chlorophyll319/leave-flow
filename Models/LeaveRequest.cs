@@ -61,8 +61,8 @@ public class LeaveRequest
     private static readonly TimeOnly LunchBreakEnd = new(13, 0);
 
     // 以小時計時長；四捨五入至 0.5 小時
-    // 同日：EndTime - StartTime 直接相減；跨日：首日 + 中間完整天數（每天固定 8 小時）+ 尾日，
-    // 首尾時段夾在上班時段內並扣除與午休重疊的時間
+    // 同日與跨日皆套用固定上班時段與午休扣除；跨日另加中間完整天數（每天固定 8 小時），
+    // 首尾（或同日單段）時段夾在上班時段內並扣除與午休重疊的時間
     public double Hours
     {
         get
@@ -70,9 +70,7 @@ public class LeaveRequest
             double rawHours;
             if (StartDate == EndDate)
             {
-                var start = StartDate.ToDateTime(StartTime ?? TimeOnly.MinValue);
-                var end = EndDate.ToDateTime(EndTime ?? TimeOnly.MinValue);
-                rawHours = (end - start).TotalHours;
+                rawHours = NetWorkHours(StartTime ?? TimeOnly.MinValue, EndTime ?? TimeOnly.MinValue);
             }
             else
             {
