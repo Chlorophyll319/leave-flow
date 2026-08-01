@@ -2,8 +2,8 @@ using LeaveFlow.Models;
 
 namespace LeaveFlow.Tests;
 
-// Hours 四捨五入至 0.5 小時；同日直接相減（短時段可能顯示 0 小時的問題另案處理，此處只驗證現況）
-// 跨日採 09:00〜18:00 上班時段公式，扣除與 12:00〜13:00 午休重疊的時間
+// Hours 四捨五入至 0.5 小時；同日與跨日皆套用 09:00〜18:00 上班時段夾值，
+// 並扣除與 12:00〜13:00 午休重疊的時間，兩者計算規則一致
 public class LeaveRequestHoursTests
 {
     private static LeaveRequest Hourly(DateOnly startDate, TimeOnly startTime, DateOnly endDate, TimeOnly endTime) => new()
@@ -37,6 +37,83 @@ public class LeaveRequestHoursTests
         var request = Hourly(new DateOnly(2026, 8, 1), new TimeOnly(9, 0), new DateOnly(2026, 8, 1), new TimeOnly(9, 30));
 
         Assert.Equal(0.5, request.Hours);
+    }
+
+    [Fact]
+    public void Hours_SameDay_FullyBeforeWorkStart_IsZero()
+    {
+        var request = Hourly(new DateOnly(2026, 8, 1), new TimeOnly(7, 0), new DateOnly(2026, 8, 1), new TimeOnly(8, 0));
+
+        Assert.Equal(0, request.Hours);
+    }
+
+    [Fact]
+    public void Hours_SameDay_FullyAfterWorkEnd_IsZero()
+    {
+        var request = Hourly(new DateOnly(2026, 8, 1), new TimeOnly(19, 0), new DateOnly(2026, 8, 1), new TimeOnly(20, 0));
+
+        Assert.Equal(0, request.Hours);
+    }
+
+    [Fact]
+    public void Hours_SameDay_FullyWithinLunchBreak_IsZero()
+    {
+        var request = Hourly(new DateOnly(2026, 8, 1), new TimeOnly(12, 0), new DateOnly(2026, 8, 1), new TimeOnly(13, 0));
+
+        Assert.Equal(0, request.Hours);
+    }
+
+    [Fact]
+    public void Hours_SameDay_PartiallyWithinLunchBreak_IsZero()
+    {
+        var request = Hourly(new DateOnly(2026, 8, 1), new TimeOnly(12, 15), new DateOnly(2026, 8, 1), new TimeOnly(12, 45));
+
+        Assert.Equal(0, request.Hours);
+    }
+
+    [Fact]
+    public void Hours_SameDay_CrossesWorkStartBoundary_ClampsToStart()
+    {
+        // 08:00~10:00：夾值後等同 09:00~10:00 = 1 小時，不重疊午休
+        var request = Hourly(new DateOnly(2026, 8, 1), new TimeOnly(8, 0), new DateOnly(2026, 8, 1), new TimeOnly(10, 0));
+
+        Assert.Equal(1, request.Hours);
+    }
+
+    [Fact]
+    public void Hours_SameDay_CrossesWorkEndBoundary_ClampsToEnd()
+    {
+        // 17:00~19:00：夾值後等同 17:00~18:00 = 1 小時，不重疊午休
+        var request = Hourly(new DateOnly(2026, 8, 1), new TimeOnly(17, 0), new DateOnly(2026, 8, 1), new TimeOnly(19, 0));
+
+        Assert.Equal(1, request.Hours);
+    }
+
+    [Fact]
+    public void Hours_SameDay_ExactWorkBoundaries_FullDayIsEightHours()
+    {
+        var request = Hourly(new DateOnly(2026, 8, 1), new TimeOnly(9, 0), new DateOnly(2026, 8, 1), new TimeOnly(18, 0));
+
+        Assert.Equal(8, request.Hours);
+    }
+
+    [Fact]
+    public void Hours_SameDay_StartTimeAfterEndTime_SafelyReturnsZero()
+    {
+        // 17:00~10:00：起訖顛倒，改用 NetWorkHours 後因 clampedTo <= clampedFrom 安全回傳 0（不再產生負數）
+        var request = Hourly(new DateOnly(2026, 8, 1), new TimeOnly(17, 0), new DateOnly(2026, 8, 1), new TimeOnly(10, 0));
+
+        Assert.Equal(0, request.Hours);
+    }
+
+    [Fact]
+    public void Hours_SameDay_MatchesCrossDayLastDaySegment_ForSameTimeRange()
+    {
+        // 09:00~11:00 在同日應為 2 小時；此值須與 Hours_CrossDay_LastDayEndsBeforeLunch_NoOverlapDeducted
+        // 案例中「尾日 09:00~11:00」單獨片段的淨工時一致，驗證同日與跨日對相同時段採用同一套規則
+        var request = Hourly(new DateOnly(2026, 8, 1), new TimeOnly(9, 0), new DateOnly(2026, 8, 1), new TimeOnly(11, 0));
+
+        Assert.Equal(2, request.Hours);
     }
 
     [Fact]
