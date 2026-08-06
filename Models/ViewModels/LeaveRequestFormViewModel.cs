@@ -65,6 +65,10 @@ public class LeaveRequestFormViewModel : IValidatableObject
                 {
                     yield return new ValidationResult("結束日期時間須晚於開始日期時間", new[] { nameof(EndTime) });
                 }
+                else if (LeaveHoursCalculator.CalculateHours(StartDate.Value, StartTime.Value, EndDate.Value, EndTime.Value) < 0.5)
+                {
+                    yield return new ValidationResult("請假時段換算工時不足 0.5 小時，請調整時間", new[] { nameof(EndTime) });
+                }
             }
         }
     }

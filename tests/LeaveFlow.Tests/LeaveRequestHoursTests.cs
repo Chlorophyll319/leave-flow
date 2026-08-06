@@ -15,6 +15,8 @@ public class LeaveRequestHoursTests
         EndTime = endTime
     };
 
+    // 此案例驗證 Entity 層 Hours 計算邏輯本身（保留給既有資料或極端情境的容錯）；
+    // 表單送出時這類換算為 0 的情境會被 LeaveRequestFormViewModelTests 擋在驗證層，不會實際存入資料庫
     [Fact]
     public void Hours_ZeroMinutes_IsZero()
     {
@@ -55,6 +57,7 @@ public class LeaveRequestHoursTests
         Assert.Equal(0, request.Hours);
     }
 
+    // 此案例同樣驗證 Entity 層計算邏輯本身；表單層的擋下行為見 LeaveRequestFormViewModelTests
     [Fact]
     public void Hours_SameDay_FullyWithinLunchBreak_IsZero()
     {
